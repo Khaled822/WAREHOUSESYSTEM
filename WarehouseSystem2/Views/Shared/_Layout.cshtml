@@ -1,33 +1,34 @@
 ﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] — Warehouse System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Mulish:wght@300;400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Warehouse</title>
+
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
 </head>
 <body>
-    <div class="app">
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div>
+                <div class="sidebar-logo">Warehouse</div>
 
-        <div class="main">
-            <header>
-                <div class="header-title">@ViewData["Title"]</div>
-                <div class="header-right">
-                    <div class="user-badge">
-                        <span>👤</span>
-                        <span>@Context.Session.GetString("GebruikerNaam")</span>
-                    </div>
-                    <div class="avatar">
-                        @(Context.Session.GetString("GebruikerNaam")?[0].ToString().ToUpper() ?? "W")
-                    </div>
-                </div>
-            </header>
-            <div class="content">
-                @RenderBody()
+                <nav class="sidebar-nav">
+                    <a asp-controller="Home" asp-action="Index" class="nav-item active">🏠 Dashboard</a>
+                    <a asp-controller="Magazijn" asp-action="Detail" asp-route-id="1" class="nav-item">🏢 Warehouse 1</a>
+                    <a asp-controller="Magazijn" asp-action="Detail" asp-route-id="2" class="nav-item">🏭 Warehouse 2</a>
+                    <a asp-controller="Shop" asp-action="Index" class="nav-item">🛒 Shop</a>
+                </nav>
             </div>
-        </div>
 
+            <div class="sidebar-bottom">
+                <a asp-controller="Account" asp-action="Logout" class="logout-link">↪ Logout</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            @RenderBody()
+        </main>
     </div>
 </body>
 </html>

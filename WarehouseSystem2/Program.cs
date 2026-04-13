@@ -8,7 +8,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
 });
 
-var connStr = builder.Configuration.GetConnectionString("WarehouseDB");
+var connStr = builder.Configuration.GetConnectionString("Warehousesystem");
 builder.Services.AddScoped<WarehouseRepository>(_ => new WarehouseRepository(connStr!));
 
 var app = builder.Build();

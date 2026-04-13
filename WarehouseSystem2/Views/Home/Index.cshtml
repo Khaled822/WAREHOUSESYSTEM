@@ -1,14 +1,222 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard";
-    var naam = ViewBag.Naam as string;
-    var email = ViewBag.Email as string;
+    ViewData["Title"] = "Dashboard Overzicht";
 }
 
-<div class="welcome-banner">
-    <div class="welcome-text">
-        <h1>Welkom terug, <span>@naam</span> 👋</h1>
-       
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="search-box">
+        <input id="searchInput" type="search" placeholder="Zoeken..." aria-label="Zoek" />
     </div>
-    <div class="welcome-icon">🏭</div>
+    <div class="topbar-icons">
+        <span class="icon">🔔</span>
+        <span class="profile">👤</span>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('searchInput');
+        const cards = Array.from(document.querySelectorAll('.warehouse-card'));
+        if (!input) return;
+
+        function escapeHtml(text) {
+            return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function stripDiacritics(s) {
+            try {
+                return s.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+            } catch (err) {
+                // fallback if Unicode property escapes not supported
+                return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            }
+        }
+
+        function highlightText(original, query) {
+            if (!query) return escapeHtml(original);
+            const orig = String(original);
+            const norm = stripDiacritics(orig);
+            const q = stripDiacritics(query);
+            if (!q) return escapeHtml(orig);
+
+            const parts = [];
+            let startIndex = 0;
+            let idx = norm.indexOf(q, startIndex);
+            while (idx !== -1) {
+                // add non-matching segment
+                if (idx > startIndex) {
+                    parts.push(escapeHtml(orig.substring(startIndex, idx)));
+                }
+                // add highlighted match (preserve original substring)
+                const match = orig.substring(idx, idx + q.length);
+                parts.push('<span class="hl">' + escapeHtml(match) + '</span>');
+                startIndex = idx + q.length;
+                idx = norm.indexOf(q, startIndex);
+            }
+            // tail
+            if (startIndex < orig.length) parts.push(escapeHtml(orig.substring(startIndex)));
+            return parts.join('');
+        }
+
+        // store original texts
+        cards.forEach(card => {
+            const nameEl = card.querySelector('.wh-name');
+            const locEl = card.querySelector('.wh-loc');
+            if (nameEl && !nameEl.dataset.orig) nameEl.dataset.orig = nameEl.textContent || '';
+            if (locEl && !locEl.dataset.orig) locEl.dataset.orig = locEl.textContent || '';
+        });
+
+        input.addEventListener('input', function (e) {
+            const q = (e.target.value || '').trim();
+            const qStripped = stripDiacritics(q);
+
+            let anyVisible = false;
+
+            cards.forEach(card => {
+                const nameEl = card.querySelector('.wh-name');
+                const locEl = card.querySelector('.wh-loc');
+                const name = nameEl ? (nameEl.dataset.orig || nameEl.textContent || '') : '';
+                const loc = locEl ? (locEl.dataset.orig || locEl.textContent || '') : '';
+
+                const nameMatches = q === '' || stripDiacritics(name).includes(qStripped);
+                const locMatches = q === '' || stripDiacritics(loc).includes(qStripped);
+                const matches = nameMatches || locMatches;
+
+                if (matches) {
+                    anyVisible = true;
+                    card.style.display = '';
+                    if (nameEl) nameEl.innerHTML = highlightText(name, q);
+                    if (locEl) locEl.innerHTML = highlightText(loc, q);
+                } else {
+                    card.style.display = 'none';
+                    if (nameEl) nameEl.textContent = name;
+                    if (locEl) locEl.textContent = loc;
+                }
+            });
+
+            // (optional) you could show a no-results message when !anyVisible
+        });
+    });
+</script>
 </div>
 
+<!-- STATS -->
+<div class="overview-stats">
+    <div class="stat-card">
+        <div class="s-label">Totale producten</div>
+        <div class="s-value">@((ViewBag.Producten ?? 0).ToString())</div>
+        <div class="s-sub">Inventaris</div>
+    </div>
+    <div class="stat-card">
+        <div class="s-label">Medewerkers</div>
+        <div class="s-value">@((ViewBag.Medewerkers ?? 0).ToString())</div>
+        <div class="s-sub">Actieve staff</div>
+    </div>
+    <div class="stat-card">
+        <div class="s-label">Saldo</div>
+        <div class="s-value">€5.000</div>
+        <div class="s-sub">Huidig budget</div>
+    </div>
+    <div class="stat-card">
+        <div class="s-label">Magazijnen</div>
+        <div class="s-value">2</div>
+        <div class="s-sub">Locaties</div>
+    </div>
+</div>
+
+<!-- HEADER -->
+<div class="section-header">
+    <h2>Dashboard Overzicht</h2>
+    <a href="#" class="section-link">Alle locaties</a>
+</div>
+
+<!-- MAGAZIJNEN -->
+<div class="warehouse-grid">
+    <div class="warehouse-card">
+        <div class="wh-top">
+            <div class="wh-icon-box">📦</div>
+            <span class="wh-badge">Actief</span>
+        </div>
+
+        <div class="wh-name">Magazijn 1</div>
+        <div class="wh-loc">Industrieweg 12, Rotterdam</div>
+
+        <div class="wh-stats">
+            <div class="wh-stat">
+                <div class="lbl">PRODUCTEN</div>
+                <div class="val">84</div>
+            </div>
+            <div class="wh-stat">
+                <div class="lbl">STAFF</div>
+                <div class="val">7</div>
+            </div>
+            <div class="wh-stat">
+                <div class="lbl">CAPACITEIT</div>
+                <div class="val">82%</div>
+            </div>
+        </div>
+
+        <a href="/Magazijn/Detail/1" class="btn-view">Bekijken</a>
+    </div>
+
+    <div class="warehouse-card">
+        <div class="wh-top">
+            <div class="wh-icon-box">🏭</div>
+            <span class="wh-badge">Actief</span>
+        </div>
+
+        <div class="wh-name">Magazijn 2</div>
+        <div class="wh-loc">Havengebied 45, Antwerpen</div>
+
+        <div class="wh-stats">
+            <div class="wh-stat">
+                <div class="lbl">PRODUCTEN</div>
+                <div class="val">40</div>
+            </div>
+            <div class="wh-stat">
+                <div class="lbl">STAFF</div>
+                <div class="val">5</div>
+            </div>
+            <div class="wh-stat">
+                <div class="lbl">CAPACITEIT</div>
+                <div class="val">65%</div>
+            </div>
+        </div>
+
+        <a href="/Magazijn/Detail/2" class="btn-view">Bekijken</a>
+    </div>
+</div>
+
+<!-- ONDERSTE DEEL -->
+<div class="bottom-grid">
+    <div class="activity-section">
+        <h3>Recente Activiteit</h3>
+
+        <div class="activity-list">
+            <div class="activity-item">
+                <div class="activity-icon">📁</div>
+                <div>
+                    <div class="activity-title">Nieuwe product toegevoegd aan Magazijn 1</div>
+                    <div class="activity-time">14 minuten geleden</div>
+                </div>
+            </div>
+
+            <div class="activity-item">
+                <div class="activity-icon">👤</div>
+                <div>
+                    <div class="activity-title">Nieuwe medewerker toegevoegd aan Magazijn 2</div>
+                    <div class="activity-time">2 uur geleden</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="quicklinks-section">
+        <h3>Snelkoppelingen</h3>
+
+        <div class="quicklinks">
+            <a href="#" class="quicklink">➕ Nieuw Product</a>
+            <a href="#" class="quicklink">👥 Nieuwe Staff</a>
+            <a href="#" class="quicklink active">🏠 Nieuw Magazijn</a>
+        </div>
+    </div>
+</div>

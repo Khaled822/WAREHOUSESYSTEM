@@ -17,20 +17,21 @@ namespace WarehouseSystem.Data
             using var conn = new MySqlConnection(_conn);
             conn.Open();
             var cmd = new MySqlCommand(
-                "SELECT COUNT(*) FROM gebruikers WHERE email=@email", conn);
+                "SELECT COUNT(*) FROM gebruiker WHERE email=@email", conn);
             cmd.Parameters.AddWithValue("@email", email);
             return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
         }
 
-        public void RegistreerGebruiker(string? naam, string? email, string? wachtwoord)
+        public void RegistreerGebruiker(string? naam, string? email, string? wachtwoord, string? rol = "gebruiker")
         {
             using var conn = new MySqlConnection(_conn);
             conn.Open();
             var cmd = new MySqlCommand(
-                "INSERT INTO gebruikers (naam, email, wachtwoord) VALUES (@naam, @email, @ww)", conn);
+                "INSERT INTO gebruiker (naam, email, wachtwoord, Rol) VALUES (@naam, @email, @ww, @rol)", conn);
             cmd.Parameters.AddWithValue("@naam", naam);
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@ww", wachtwoord);
+            cmd.Parameters.AddWithValue("@rol", rol);
             cmd.ExecuteNonQuery();
         }
 
@@ -39,7 +40,7 @@ namespace WarehouseSystem.Data
             using var conn = new MySqlConnection(_conn);
             conn.Open();
             var cmd = new MySqlCommand(
-                "SELECT * FROM gebruikers WHERE email=@email AND wachtwoord=@ww", conn);
+                "SELECT * FROM gebruiker WHERE email=@email AND wachtwoord=@ww", conn);
             cmd.Parameters.AddWithValue("@email", email);
             cmd.Parameters.AddWithValue("@ww", wachtwoord);
             var r = cmd.ExecuteReader();
@@ -51,6 +52,22 @@ namespace WarehouseSystem.Data
                     Email = r.GetString("email")
                 };
             return null;
+        }
+
+        public int GetMedewerkerCount()
+        {
+            using var conn = new MySqlConnection(_conn);
+            conn.Open();
+            var cmd = new MySqlCommand("SELECT COUNT(*) FROM medewerker", conn);
+            return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        public int GetProductCount()
+        {
+            using var conn = new MySqlConnection(_conn);
+            conn.Open();
+            var cmd = new MySqlCommand("SELECT COUNT(*) FROM product", conn);
+            return Convert.ToInt32(cmd.ExecuteScalar());
         }
     }
 }
