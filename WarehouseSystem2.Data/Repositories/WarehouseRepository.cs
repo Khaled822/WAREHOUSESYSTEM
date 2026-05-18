@@ -1,9 +1,10 @@
-﻿using MySql.Data.MySqlClient;
-using WarehouseSystem.Models;
+using MySql.Data.MySqlClient;
+using WarehouseSystem.Domain.Abstractions;
+using WarehouseSystem.Domain.Entities;
 
-namespace WarehouseSystem.Data
+namespace WarehouseSystem.Data.Repositories
 {
-    public class WarehouseRepository
+    public class WarehouseRepository : IWarehouseRepository
     {
         private readonly string _conn;
 

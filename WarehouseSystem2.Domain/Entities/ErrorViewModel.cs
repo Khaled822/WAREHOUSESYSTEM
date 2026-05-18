@@ -1,4 +1,4 @@
-namespace WarehouseSystem2.Models
+namespace WarehouseSystem.Domain.Entities
 {
     public class ErrorViewModel
     {

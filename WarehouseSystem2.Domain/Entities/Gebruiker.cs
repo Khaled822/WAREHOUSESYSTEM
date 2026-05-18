@@ -1,4 +1,4 @@
-﻿namespace WarehouseSystem.Models
+namespace WarehouseSystem.Domain.Entities
 {
     public class Gebruiker
     {
