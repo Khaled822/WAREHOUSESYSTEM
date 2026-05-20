@@ -1,6 +1,4 @@
-using WarehouseSystem.Domain.Abstractions;
-using WarehouseSystem.Data.Repositories;
-using WarehouseSystem.Domain.Services;
+using WarehouseSystem.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
@@ -11,8 +9,7 @@ builder.Services.AddSession(options =>
 });
 
 var connStr = builder.Configuration.GetConnectionString("Warehousesystem");
-builder.Services.AddScoped<IWarehouseRepository>(provider => new WarehouseRepository(connStr!));
-builder.Services.AddScoped<IGebruikerService, GebruikerService>();
+builder.Services.AddScoped<WarehouseRepository>(_ => new WarehouseRepository(connStr!));
 
 var app = builder.Build();
 app.UseStaticFiles();

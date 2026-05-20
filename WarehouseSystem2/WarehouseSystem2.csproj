@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -12,11 +12,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\images\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\WarehouseSystem2.Data\WarehouseSystem2.Data.csproj" />
-    <ProjectReference Include="..\WarehouseSystem2.Domain\WarehouseSystem2.Domain.csproj" />
   </ItemGroup>
 
 </Project>

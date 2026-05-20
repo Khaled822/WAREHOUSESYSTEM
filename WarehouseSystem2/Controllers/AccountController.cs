@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WarehouseSystem.Domain.Entities;
-using WarehouseSystem.Domain.Services;
+using WarehouseSystem.Data;
+using WarehouseSystem.Models;
 
 namespace WarehouseSystem.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IGebruikerService _service;
+        private readonly WarehouseRepository _repo;
 
-        public AccountController(IGebruikerService service)
+        public AccountController(WarehouseRepository repo)
         {
-            _service = service;
+            _repo = repo;
         }
 
         public IActionResult Login()
@@ -23,7 +23,7 @@ namespace WarehouseSystem.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            var gebruiker = _service.Login(model.Email, model.Wachtwoord);
+            var gebruiker = _repo.Login(model.Email, model.Wachtwoord);
             if (gebruiker != null)
             {
                 HttpContext.Session.SetString("GebruikerNaam", gebruiker.Naam!);
@@ -50,23 +50,14 @@ namespace WarehouseSystem.Controllers
                 ViewBag.Fout = "Wachtwoorden komen niet overeen.";
                 return View(model);
             }
-
-            try
+            if (_repo.EmailBestaat(model.Email))
             {
-                _service.RegistreerGebruiker(model.Naam, model.Email, model.Wachtwoord);
-                TempData["Success"] = "Account aangemaakt! Je kunt nu inloggen.";
-                return RedirectToAction("Login");
-            }
-            catch (InvalidOperationException ex)
-            {
-                ViewBag.Fout = ex.Message;
+                ViewBag.Fout = "Dit e-mailadres is al in gebruik.";
                 return View(model);
             }
-            catch (ArgumentException ex)
-            {
-                ViewBag.Fout = ex.Message;
-                return View(model);
-            }
+            _repo.RegistreerGebruiker(model.Naam, model.Email, model.Wachtwoord);
+            TempData["Success"] = "✅ Account aangemaakt! Je kunt nu inloggen.";
+            return RedirectToAction("Login");
         }
 
         public IActionResult Logout()
