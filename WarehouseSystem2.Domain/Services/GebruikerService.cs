@@ -1,7 +1,7 @@
 using WarehouseSystem.Domain.Abstractions;
 using WarehouseSystem.Domain.Entities;
 
-namespace WarehouseSystem.Data.Services
+namespace WarehouseSystem.Domain.Services
 {
     public class GebruikerService : IGebruikerService
     {
