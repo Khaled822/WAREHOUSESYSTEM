@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WarehouseSystem.Data;
-using WarehouseSystem.Models;
+using WarehouseSystem.Domain.Entities;
+using WarehouseSystem.Domain.Services;
 
 namespace WarehouseSystem.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly WarehouseRepository _repo;
+        private readonly IGebruikerService _service;
 
-        public AccountController(WarehouseRepository repo)
+        public AccountController(IGebruikerService service)
         {
-            _repo = repo;
+            _service = service;
         }
 
         public IActionResult Login()
@@ -23,7 +23,7 @@ namespace WarehouseSystem.Controllers
         [HttpPost]
         public IActionResult Login(LoginViewModel model)
         {
-            var gebruiker = _repo.Login(model.Email, model.Wachtwoord);
+            var gebruiker = _service.Login(model.Email, model.Wachtwoord);
             if (gebruiker != null)
             {
                 HttpContext.Session.SetString("GebruikerNaam", gebruiker.Naam!);
@@ -50,14 +50,23 @@ namespace WarehouseSystem.Controllers
                 ViewBag.Fout = "Wachtwoorden komen niet overeen.";
                 return View(model);
             }
-            if (_repo.EmailBestaat(model.Email))
+
+            try
             {
-                ViewBag.Fout = "Dit e-mailadres is al in gebruik.";
+                _service.RegistreerGebruiker(model.Naam, model.Email, model.Wachtwoord);
+                TempData["Success"] = "Account aangemaakt! Je kunt nu inloggen.";
+                return RedirectToAction("Login");
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewBag.Fout = ex.Message;
                 return View(model);
             }
-            _repo.RegistreerGebruiker(model.Naam, model.Email, model.Wachtwoord);
-            TempData["Success"] = "✅ Account aangemaakt! Je kunt nu inloggen.";
-            return RedirectToAction("Login");
+            catch (ArgumentException ex)
+            {
+                ViewBag.Fout = ex.Message;
+                return View(model);
+            }
         }
 
         public IActionResult Logout()
