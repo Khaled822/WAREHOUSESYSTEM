@@ -1,0 +1,147 @@
+@{
+    ViewData["Title"] = "Warehouse Detail";
+    var products = ViewData["Products"] as dynamic ?? new List<dynamic>();
+    var capacity = (int)(ViewData["Capacity"] ?? 0);
+    var warehouseName = ViewData["WarehouseName"];
+}
+
+<div class="warehouse-detail-container">
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="search-box">
+            <input type="text" placeholder="Zoeken..." />
+        </div>
+        <div class="topbar-icons">
+            <span class="notification-icon">🔔</span>
+            <span class="user-icon">👤</span>
+        </div>
+    </div>
+
+    <!-- HEADER -->
+    <div class="warehouse-header">
+        <div class="header-title-section">
+            <h1>@warehouseName: Detailed View</h1>
+            <div class="capacity-indicator">
+                <span class="capacity-label">Capacity:</span>
+                <div class="capacity-bar">
+                    <div class="capacity-fill" style="width: @capacity%"></div>
+                </div>
+                <span class="capacity-percentage">@capacity%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="warehouse-tabs">
+        <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="products">Products (Selected)</button>
+            <button class="tab-btn" data-tab="employees">Employees</button>
+            <button class="tab-btn" data-tab="shop">Shop</button>
+        </div>
+
+        <!-- PRODUCTS TAB -->
+        <div id="products" class="tab-content active">
+            <div class="products-section">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>PRODUCT ID</th>
+                            <th>NAME</th>
+                            <th>CATEGORY</th>
+                            <th>STOCK LEVELS</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var product in products)
+                        {
+                            <tr>
+                                <td>P00@(product.Id)</td>
+                                <td>@product.Naam</td>
+                                <td>@product.Categorie</td>
+                                <td>@product.Voorraad</td>
+                                <td>
+                                    <div class="status-checkbox">
+                                        <input type="checkbox" checked />
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- EMPLOYEES TAB -->
+        <div id="employees" class="tab-content">
+            <p>Employee information would be displayed here.</p>
+        </div>
+
+        <!-- SHOP TAB -->
+        <div id="shop" class="tab-content">
+            <p>Shop information would be displayed here.</p>
+        </div>
+    </div>
+
+    <!-- CONTENT GRID -->
+    <div class="warehouse-content-grid">
+        <!-- RECENT ACTIVITY -->
+        <div class="activity-section">
+            <h3>Recente Activity</h3>
+            <div class="activity-items">
+                <div class="activity-item">
+                    <span class="activity-icon">📦</span>
+                    <div class="activity-info">
+                        <p class="activity-title">Nieuwe product toegevoegd aan Magazijn 1</p>
+                        <p class="activity-time">2 uurr geleden</p>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <span class="activity-icon">👤</span>
+                    <div class="activity-info">
+                        <p class="activity-title">Nieuwe medewerker toegevoegd aan Magazijn 2</p>
+                        <p class="activity-time">3 uur geleden</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- QUICK LINKS -->
+        <div class="quicklinks-section">
+            <h3>Snelkoppelingen</h3>
+            <div class="quicklinks-items">
+                <a href="#" class="quicklink-card">
+                    <span class="quicklink-icon">📦</span>
+                    <span class="quicklink-text">Nieuwe Product</span>
+                </a>
+                <a href="#" class="quicklink-card">
+                    <span class="quicklink-icon">👤</span>
+                    <span class="quicklink-text">Nieuwe Staff</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tabName = this.getAttribute('data-tab');
+
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Show selected tab and mark button as active
+            document.getElementById(tabName).classList.add('active');
+            this.classList.add('active');
+        });
+    });
+</script>
